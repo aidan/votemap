@@ -7,19 +7,13 @@
 
       function drawMarkersMap() {
       var data = google.visualization.arrayToDataTable([
-        ['City',  'Population', 'Area'],
-        ['Rome',     2761477,    1285.31],
-        ['Milan',    1324110,    181.76],
-        ['Naples',   959574,     117.27],
-        ['Turin',    907563,     130.17],
-        ['Palermo',  655875,     158.9],
-        ['Genoa',    607906,     243.60],
-        ['Bologna',  380181,     140.7],
-        ['Florence', 371282,     102.41]
+        ['Polling Station',  'Votes'],
+        ['G13 1QT',     25],
+        ['G11 5QN',     38],
       ]);
 
       var options = {
-        region: 'IT',
+        region: "GB",
         displayMode: 'markers',
         colorAxis: {colors: ['green', 'blue']}
       };
