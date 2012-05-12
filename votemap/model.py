@@ -10,9 +10,14 @@ db = MongoEngine()
 class PollingStation(db.Document):
     name = db.StringField(required=True, unique=True)
     postcode = db.StringField(required=True, unique=True)
-    coords = db.GeoPointField()
+    ne_coords = db.GeoPointField()
+    sw_coords = db.GeoPointField()
     min_box = db.IntField(required=True, unique=True)
     max_box = db.IntField(required=True, unique=True)
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.objects(name=name).first()
 
 class Candidate(db.Document):
     """

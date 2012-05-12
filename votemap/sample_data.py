@@ -9,8 +9,10 @@ def make_sample_data():
 
     jordanhill_church = PollingStation(name="Jordan Hill Church",
                                        postcode="G13 1QT",
-                                       coords=(55.88519010,
-                                               4.329431899999999),
+                                       ne_coords=(55.88564250,
+                                                  -4.32859980),
+                                       sw_coords=(55.88461760,
+                                                  -4.33007750),
                                        min_box=236, max_box=239)
     tally = Tally(candidate=michael)
     tally.votes = [23,43,19,13,7,3,1,0,0,0,1,0,0]
@@ -22,8 +24,10 @@ def make_sample_data():
 
     st_tams = PollingStation(name="St Thomas Aquinus",
                              postcode="G14 9PP",
-                             coords=(55.88078530000001,
-                                     -4.33564360),
+                             ne_coords=(55.88139160,
+                                        -4.33425780),
+                             sw_coords=(55.88030260,
+                                        -4.337324499999999),
                              min_box=240, max_box=241)
     st_tams.save()
     tally = Tally(candidate=michael)
