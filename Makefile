@@ -57,3 +57,6 @@ pyflakes:
 check: pep8 pyflakes test
 	@grep ^TOTAL tests_output/test.log | grep 100% >/dev/null || \
 	{ echo 'Unit tests coverage is incomplete.'; exit 1; }
+
+import-data:
+	@python import_data.py -p data/ward-11-pollingstations.csv
