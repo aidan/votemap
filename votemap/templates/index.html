@@ -5,5 +5,13 @@
 
 {% block container %}
 
+  <div align="left">
+  {% for candidate in candidates %}
+      {{ candidate.name }}<br/>
+  {% endfor %}
+  </div>
+  <div align="right">
+    <iframe id="map" height="660" width="880" src="{{ url_for('controllers.map') }}">
+  </div>
 {% endblock container %}
 

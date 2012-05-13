@@ -3,15 +3,20 @@
 
 import urllib
 
-from flask import Blueprint,render_template
+from flask import Blueprint, render_template
 
-from votemap.model import PollingStation
+from votemap.model import Candidate, PollingStation
 
 controllers = Blueprint("controllers", __name__,
                         static_folder="static")
 
 @controllers.route("/", methods=["GET"])
 def index():
+    candidates = Candidate.objects.all()
+    return render_template("index.html", candidates=candidates)
+
+@controllers.route("map", methods=["GET"])
+def map():
     data = []
     polling_stations = PollingStation.objects.all()
     for ps in polling_stations:
