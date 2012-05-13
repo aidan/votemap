@@ -33,8 +33,12 @@ class Tally(db.Document):
     
 class Box(db.Document):
     number = db.IntField(required=True, unique=True)
-    polling_station = db.ReferenceField(PollingStation)
+    polling_station = db.ReferenceField(PollingStation, required=True)
     votes = db.ListField()
+
+    @classmethod
+    def get_by_polling_station(cls, ps):
+        return cls.objects(polling_station=ps).all()
 
 def clear_collections():
     PollingStation.drop_collection()
