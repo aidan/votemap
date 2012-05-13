@@ -19,6 +19,10 @@ class PollingStation(db.Document):
     def get_by_name(cls, name):
         return cls.objects(name=name).first()
 
+    @classmethod
+    def get_for_box(cls, box_number):
+        return cls.objects(min_box__lte=box_number, max_box__gte=box_number).first()
+    
 class Candidate(db.Document):
     """
     A candidate who gets votes
