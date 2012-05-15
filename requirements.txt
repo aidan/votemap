@@ -21,5 +21,3 @@ https://github.com/sbook/flask-mongoengine/tarball/d907e36e8055bdf81d73291a86f5a
 
 # fix our decorators
 decorator==3.3.2
-
-geopy
