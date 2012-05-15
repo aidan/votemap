@@ -31,6 +31,10 @@ class Candidate(db.Document):
     name = db.StringField(required=True, unique=True)
     party = db.StringField()
 
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.objects(name=name).first()
+
 class Tally(db.Document):
     candidate = db.ReferenceField(Candidate)
     preferences = db.ListField()
