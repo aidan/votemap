@@ -34,7 +34,15 @@ class PollingStation(db.Document):
         self.ne_coords = (ne['lat'], ne['lng'])
         sw = port['southwest']
         self.sw_coords = (sw['lat'], sw['lng'])
-         
+
+    def get_total_for_candidate(self, candidate_id):
+        total = 0
+        for box in Box.get_by_polling_station(self):
+            for tally in box.votes:
+                if str(tally.candidate.id) == candidate_id:
+                    total = total + tally.preferences[0]
+        return total
+        
     
 class Candidate(db.Document):
     """
