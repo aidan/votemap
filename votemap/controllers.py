@@ -34,8 +34,8 @@ def map():
     params = urllib.urlencode({'thedata': '\n'.join(data),
                                'xresInput':20,
                                'yresInput':20,
-                               'lowercutoffInput':0.5,
-                               'blendInput':15,
+                               'lowercutoffInput':0.1,
+                               'blendInput':20,
                                'xsizeInput':800,
                                'ysizeInput':600,
                                'zoomInput':14
