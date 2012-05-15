@@ -5,13 +5,31 @@
 
 {% block container %}
 
-  <div align="left">
-  {% for candidate in candidates %}
-      <a onclick="$('#map').attr('src', '{{ url_for('controllers.map', candidate_id=candidate.id) }}')" href="javascript:void();">{{ candidate.name }}</a><br/>
-  {% endfor %}
-  </div>
-  <div align="right">
-    <iframe id="map" height="660" width="880" src="{{ url_for('controllers.map') }}">
-  </div>
+  <table>
+    <tr>
+      <td>
+      <table border="1">
+      {% for candidate in candidates %}
+      <tr>
+        <td>
+          <a onclick="$('#map').attr('src', '{{ url_for('controllers.map', candidate_id=candidate.id) }}')" href="javascript:void();">{{ candidate.name }}</a><br/>
+        </td>
+        <td>
+          <table>
+            {% for station in stations[candidate.id].keys() %}
+            <tr>
+              <td>{{ station }}: {{ stations[candidate.id][station] }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      {% endfor %}
+        </table>
+      </td>
+      <td>
+        <iframe id="map" height="660" width="880" src="{{ url_for('controllers.map') }}">
+      </td>
+    </tr>
+  </table>
 {% endblock container %}
 
