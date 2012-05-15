@@ -23,7 +23,6 @@ def map():
     for ps in polling_stations:
         total = 0
         for box in Box.get_by_polling_station(ps):
-            print box.votes
             for tally in box.votes:
                 if str(tally.candidate.id) == candidate_id:
                     total = total + tally.preferences[0]
