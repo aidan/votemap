@@ -28,7 +28,7 @@ def import_polling_stations(pspath):
         else:
             ps.min_box = int(boxes)
             ps.max_box = int(boxes)
-
+        ps.update_coords()
         ps.save()
         count = count + 1
     print ("Added %d Polling Stations to finish with %d" %

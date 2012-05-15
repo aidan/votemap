@@ -1,6 +1,9 @@
 # Copyright 2012 Aidan Skinner <aidan@skinner.me.uk>, all rights
 # reserved
 
+import json
+import urllib
+
 from flaskext.mongoengine import MongoEngine
 
 from mongoengine.queryset import QuerySet
@@ -22,6 +25,16 @@ class PollingStation(db.Document):
     @classmethod
     def get_for_box(cls, box_number):
         return cls.objects(min_box__lte=box_number, max_box__gte=box_number).first()
+
+    def update_coords(self):
+        url = "http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % \
+            urllib.quote(self.postcode)
+        port = json.loads(urllib.urlopen(url).read())["results"][0]['geometry']['viewport']
+        ne = port['northeast']
+        self.ne_coords = (ne['lat'], ne['lng'])
+        sw = port['southwest']
+        self.sw_coords = (sw['lat'], sw['lng'])
+         
     
 class Candidate(db.Document):
     """
