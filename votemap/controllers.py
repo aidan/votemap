@@ -12,7 +12,7 @@ controllers = Blueprint("controllers", __name__,
 @controllers.route("/", methods=["GET"])
 def index():
     candidates = Candidate.objects.all()
-    polling_stations = PollingStation.objects.all()
+    polling_stations = PollingStation.objects.order_by("name").all()
     stations = {}
     for candidate in candidates:
         stations[candidate.id] = {}
