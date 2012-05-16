@@ -2,6 +2,7 @@
 # reserved
 
 from flask import Blueprint, jsonify, render_template, request
+from shapely.geometry import MultiPoint
 
 from votemap.model import Candidate, PollingStation
 
@@ -36,11 +37,16 @@ def get_candidate_data():
     candidate_id = request.args["candidate_id"]
     data = []
     polling_stations = PollingStation.objects.all()
+    geoms = []
     for ps in polling_stations:
         total = ps.get_total_for_candidate(candidate_id)
-        for coords in ps.ne_coords, ps.sw_coords:
-            a, b = coords
-            data.append({"lat": a,
-                         "lon": b,
-                         "total": total})
-    return jsonify({"results": data})
+        geoms.append(ps.coords)
+        lat, lon = ps.coords
+        data.append({"lat": lat,
+                     "lon": lon,
+                     "total": total})
+    area = MultiPoint(geoms)
+    viewdata = {"centre_lat": area.centroid.x,
+                "centre_lon": area.centroid.y}
+                  
+    return jsonify(results=data, viewdata=viewdata)
