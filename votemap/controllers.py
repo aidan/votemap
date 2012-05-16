@@ -1,9 +1,7 @@
 # Copyright 2012 Aidan Skinner <aidan@skinner.me.uk>, all rights
 # reserved
 
-import urllib
-
-from flask import Blueprint, render_template, request
+from flask import Blueprint, jsonify, render_template, request
 
 from votemap.model import Candidate, PollingStation
 
@@ -31,25 +29,18 @@ def index():
 @controllers.route("map", methods=["GET"])
 def map():
     candidate_id = request.args["candidate_id"]
+    return render_template("map.html", candidate_id=candidate_id)
+
+@controllers.route('get_candidate_data')
+def get_candidate_data():
+    candidate_id = request.args["candidate_id"]
     data = []
     polling_stations = PollingStation.objects.all()
     for ps in polling_stations:
         total = ps.get_total_for_candidate(candidate_id)
         for coords in ps.ne_coords, ps.sw_coords:
             a, b = coords
-            data.append('%s %s %d' % (a, b, total))
-
-    print '\n'.join(data)
-    params = urllib.urlencode({'thedata': '\n'.join(data),
-                               'xresInput':20,
-                               'yresInput':20,
-                               'lowercutoffInput':0.1,
-                               'blendInput':20,
-                               'xsizeInput':800,
-                               'ysizeInput':600,
-                               'zoomInput':14
-                               })
-    f = urllib.urlopen('http://diffent.com/map/mapit10.php',
-                       params)
-        
-    return f.read()
+            data.append({"lat": a,
+                         "lon": b,
+                         "total": total})
+    return jsonify({"results": data})
