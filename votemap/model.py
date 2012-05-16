@@ -13,8 +13,7 @@ db = MongoEngine()
 class PollingStation(db.Document):
     name = db.StringField(required=True, unique=True)
     postcode = db.StringField(required=True, unique=True)
-    ne_coords = db.GeoPointField()
-    sw_coords = db.GeoPointField()
+    coords = db.GeoPointField()
     min_box = db.IntField(required=True, unique=True)
     max_box = db.IntField(required=True, unique=True)
 
@@ -29,11 +28,8 @@ class PollingStation(db.Document):
     def update_coords(self):
         url = "http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % \
             urllib.quote(self.postcode)
-        port = json.loads(urllib.urlopen(url).read())["results"][0]['geometry']['viewport']
-        ne = port['northeast']
-        self.ne_coords = (ne['lat'], ne['lng'])
-        sw = port['southwest']
-        self.sw_coords = (sw['lat'], sw['lng'])
+        location = json.loads(urllib.urlopen(url).read())["results"][0]['geometry']['location']
+        self.coords = (location['lat'], location['lng'])
 
     def get_total_for_candidate(self, candidate_id):
         total = 0
