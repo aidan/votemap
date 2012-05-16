@@ -25,6 +25,16 @@ class PollingStation(db.Document):
     def get_for_box(cls, box_number):
         return cls.objects(min_box__lte=box_number, max_box__gte=box_number).first()
 
+    def get_total_votes(self):
+        total = 0
+        for box in Box.get_by_polling_station(self):
+            for tally in box.votes:
+                try:
+                    total = total + tally.preferences[0]
+                except:
+                    print ("Box %s tally for %s failed " % (box.number, tally.candidate.name))
+        return total
+    
     def update_coords(self):
         url = "http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % \
             urllib.quote(self.postcode)

@@ -42,9 +42,12 @@ def get_candidate_data():
         total = ps.get_total_for_candidate(candidate_id)
         geoms.append(ps.coords)
         lat, lon = ps.coords
-        data.append({"lat": lat,
+        data.append({"name": ps.name,
+                     "lat": lat,
                      "lon": lon,
-                     "total": total})
+                     "total": total,
+                     "percentage": int((float(total) / ps.get_total_votes()) * 100)
+                     })
     area = MultiPoint(geoms)
     viewdata = {"centre_lat": area.centroid.x,
                 "centre_lon": area.centroid.y}
