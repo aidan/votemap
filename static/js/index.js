@@ -1,5 +1,6 @@
 var map;
 var circles = [];
+var colours = ["#FF0000", "#00FF00"];
 
 $(function() {
       var myOptions = {
@@ -8,41 +9,47 @@ $(function() {
       };
       map = new google.maps.Map(document.getElementById("map_canvas"),
                                     myOptions);
-      $('#candidate').bind('change', change_details);
+      $('#candidate_1').bind('change', change_details);
+      $('#candidate_2').bind('change', change_details);
       $('#type').bind('change', change_details);
 });
 
 function change_details() {
-    var candidate_id = $('#candidate').val();
     var type = $('#type').val();
-    $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
-                  candidate_id:  candidate_id
-              }, function(data) {
-                  draw_map(data.viewdata, data.results, type);
-              });
-    
-}
-
-function draw_map(viewdata, results, type) {
     for (i in circles) {
         circles[i].setMap(null);
     }
     circles = [];
+    $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
+                  candidate_id:  $('#candidate_1').val()
+              }, function(data) {
+                  update_candidate(0, data.viewdata, data.results, type);
+              });
+    $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
+                  candidate_id:  $('#candidate_2').val()
+              }, function(data) {
+                  update_candidate(1, data.viewdata, data.results, type);
+              });
+    
+}
+
+function update_candidate(candidate, viewdata, results, type) {
     map.setCenter(new google.maps.LatLng(viewdata.centre_lat, viewdata.centre_lon));
     for (i in results) {
         var station = results[i];
-        add_heat(station, map, type);
-        $("#"+station.id).text(station.votes["total"] + "  (" + station.votes["percentage"] + "%)");
+        add_heat(candidate, station, map, type);
+        $("#"+candidate+station.id).text(station.votes["total"] + "  (" + station.votes["percentage"] + "%)");
+        $("#"+candidate+station.id).css("background-color", colours[candidate]);
     }
 }
 
-function add_heat(result, ma, type) {
+function add_heat(colour_index, result, ma, type) {
     // Construct the circle. 
     var heatOptions = {
-        strokeColor: "#FF0000",
+        strokeColor: colours[colour_index],
         strokeOpacity: 0.8,
         strokeWeight: 2,
-        fillColor: "#FF0000",
+        fillColor: colours[colour_index],
         fillOpacity: 0.35,
         map: map,
         radius: result.votes[type],

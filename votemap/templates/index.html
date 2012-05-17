@@ -20,7 +20,7 @@
   <table>
     <tr>
       <td>
-        <select id="candidate" name="candidate">
+        <select id="candidate_1" name="candidate">
           <option selected="true">
             --Pick a candidate---
           </option>
@@ -30,6 +30,20 @@
           </option>
           {% endfor %}
         </select>
+      </td>
+      <td>
+        <select id="candidate_2" name="candidate">
+          <option selected="true">
+            --Pick a candidate---
+          </option>
+          {% for candidate in candidates %}
+          <option value="{{ candidate.id }}">
+            {{ candidate.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </td>
+      <td>
         <select id="type" name="type">
           <option value="total">Total</option>
           <option value="percentage">Percentage</option>
@@ -41,7 +55,17 @@
           {% for station in stations %}
           <tr>
             <td> {{ station.name }} : </td>
-            <td><span id="{{ station.id }}">Unknown for {{ station.name }}</span></td>
+            <td><span id="0{{ station.id }}">Unknown for {{ station.name }}</span></td>
+          </tr>
+          {% endfor %}
+        </table>
+      </td>
+      <td>
+        <table>
+          {% for station in stations %}
+          <tr>
+            <td> {{ station.name }} : </td>
+            <td><span id="1{{ station.id }}">Unknown for {{ station.name }}</span></td>
           </tr>
           {% endfor %}
         </table>
