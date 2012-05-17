@@ -8,7 +8,7 @@
   <style type="text/css">
     html { height: 100% }
     body { height: 100%; margin: 0; padding: 0 }
-    #map_canvas { height: 100% }
+    #map_canvas { height: 50% }
   </style>
   <script type="text/javascript"
           src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBtPenmfNLwDX1BOjuxnCD-eSsu4D5uXSk&sensor=false">
@@ -17,9 +17,15 @@
   
   
 {% block container %}
-  <table>
-    <tr>
-      <td>
+  <div class="container">
+    <div class="row">
+      <div class="span4">
+        <select id="type" name="type">
+          <option value="total">Total</option>
+          <option value="percentage">Percentage</option>
+        </select>
+      </div>
+      <div class="span2">
         <select id="candidate_1" name="candidate">
           <option selected="true">
             --Pick a candidate---
@@ -30,13 +36,15 @@
           </option>
           {% endfor %}
         </select>
+      </div>
+      <div class="span2">
         <select id="preference_1" name="preference_1">
           {% for pref in candidates %}
             <option value="{{ loop.index0 }}">Preference: {{ loop.index }}</option>
           {% endfor %}
         </select>
-      </td>
-      <td>
+      </div>
+      <div class="span2">
         <select id="candidate_2" name="candidate">
           <option selected="true">
             --Pick a candidate---
@@ -47,41 +55,29 @@
           </option>
           {% endfor %}
         </select>
+      </div>
+      <div class="span2">
         <select id="preference_2" name="preference_2">
           {% for pref in candidates %}
             <option value="{{ loop.index0 }}">Preference: {{ loop.index }}</option>
           {% endfor %}
         </select>
-      </td>
-      <td>
-        <select id="type" name="type">
-          <option value="total">Total</option>
-          <option value="percentage">Percentage</option>
-        </select>
-      </td>
-    <tr>
-      <td>
-        <table>
-          {% for station in stations %}
-          <tr>
-            <td> {{ station.name }} : </td>
-            <td><span id="0{{ station.id }}">Unknown for {{ station.name }}</span></td>
-          </tr>
-          {% endfor %}
-        </table>
-      </td>
-      <td>
-        <table>
-          {% for station in stations %}
-          <tr>
-            <td> {{ station.name }} : </td>
-            <td><span id="1{{ station.id }}">Unknown for {{ station.name }}</span></td>
-          </tr>
-          {% endfor %}
-        </table>
-      </td>
-    </tr>
-  </table>
+      </div>
+    </div><!-- row -->
+    {% for station in stations %}
+    <div class="row">
+      <div class="span4">
+        {{ station.name }}
+      </div>
+      <div class="span4">
+        <span id="0{{ station.id }}">Unknown for {{ station.name }}</span>
+      </div>
+      <div class="span4">
+        <span id="1{{ station.id }}">Unknown for {{ station.name }}</span>
+      </div>
+    </div><!-- row -->
+    {% endfor %}
+  </div><!-- container -->
   <div id="map_canvas"></div>
 {% endblock container %}
 
