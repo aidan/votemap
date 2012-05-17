@@ -86,8 +86,9 @@ class Candidate(db.Document):
         return cls.objects(name=name).first()
 
 class Tally(db.Document):
-    candidate = db.ReferenceField(Candidate)
+    candidate = db.ReferenceField(Candidate, required=True)
     preferences = db.ListField()
+    polling_station = db.ReferenceField(PollingStation, required=True)
     
 class Box(db.Document):
     number = db.IntField(required=True, unique=True)

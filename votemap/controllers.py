@@ -4,7 +4,7 @@
 from flask import Blueprint, jsonify, render_template, request
 from shapely.geometry import MultiPoint
 
-from votemap.model import Candidate, PollingStation, Ward
+from votemap.model import Candidate, PollingStation, Tally, Ward
 
 controllers = Blueprint("controllers", __name__,
                         static_folder="static")
@@ -22,23 +22,32 @@ def map():
 def get_candidate_data():
     candidate_id = request.args["candidate_id"]
     preference = int(request.args["preference"])
-    data = []
-    polling_stations = PollingStation.objects.all()
     geoms = []
-    for ps in polling_stations:
-        total = ps.get_total_for_candidate(candidate_id, preference)
-        if total == 0:
-            continue
-        geoms.append(ps.coords)
-        lat, lon = ps.coords
-        data.append({"id": str(ps.id),
-                     "name": ps.name,
+    ps = {}
+    candidate = Candidate.objects(id=candidate_id).first()
+    if candidate is None:
+        return
+    tallies = Tally.objects(candidate=candidate).all()
+    for tally in tallies:
+        p = tally.polling_station.id
+        if p not in ps:
+            ps[p] = tally.preferences[preference]
+        else:
+            ps[p] += tally.preferences[preference]
+        
+    data = []
+    for p_id, total in ps.items():
+        p = PollingStation.objects(id=p_id).first()
+        geoms.append(p.coords)
+        lat, lon = p.coords
+        data.append({"id": str(p.id),
+                     "name": p.name,
                      "lat": lat,
                      "lon": lon,
                      "votes":
                          { "total": total,
                            "percentage": int((float(total) /
-                                              ps.get_total_votes(preference)) * 100)
+                                              p.get_total_votes(preference)) * 100)
                            }
                      })
     area = MultiPoint(geoms)

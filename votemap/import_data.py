@@ -93,7 +93,7 @@ def import_boxes(boxpath):
                 if candidate is None:
                     candidate = Candidate(name=name, ward=box.polling_station.ward)
                     candidate.save()
-                tally = Tally(candidate=candidate)
+                tally = Tally(candidate=candidate, polling_station=box.polling_station)
                 try:
                     tally.preferences = [int(i) for i in row[1:]]
                 except ValueError:
