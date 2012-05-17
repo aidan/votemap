@@ -1,4 +1,5 @@
 from optparse import OptionParser
+import os
 
 from votemap.app import create_app
 from votemap.import_data import import_polling_stations, import_boxes
@@ -13,11 +14,15 @@ if __name__ == "__main__":
 
     parser.add_option("-b", "--boxes",
                       dest="boxes", default=False,
-                      help="Box report file to import")
+                      help="Directory with boxes to import")
 
     (options, args) = parser.parse_args()
     
     app = create_app()
     clear_collections()
-    import_polling_stations(options.polling_station)
-    import_boxes(options.boxes)
+    if options.polling_station:
+        import_polling_stations(options.polling_station)
+    if options.boxes:
+        for boxfile in os.listdir(options.boxes):
+            print boxfile
+            import_boxes(options.boxes+"/"+boxfile)
