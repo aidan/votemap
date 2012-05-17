@@ -9,14 +9,56 @@ $(function() {
       };
       map = new google.maps.Map(document.getElementById("map_canvas"),
                                     myOptions);
-      $('#candidate_1').bind('change', change_details);
-      $('#candidate_2').bind('change', change_details);
-      $('#preference_1').bind('change', change_details);
-      $('#preference_2').bind('change', change_details);
-      $('#type').bind('change', change_details);
+      $('#ward').bind('change', change_ward);
+      $('#candidate_1').bind('change', change_candidates);
+      $('#candidate_2').bind('change', change_candidates);
+      $('#preference_1').bind('change', change_candidates);
+      $('#preference_2').bind('change', change_candidates);
+      $('#type').bind('change', change_candidates);
+      change_ward();
 });
 
-function change_details() {
+function change_ward() {
+    $.getJSON($SCRIPT_ROOT + '/get_ward_data', {
+                  ward: $('#ward').val()
+              }, function (data) {
+                  update_ward(data);
+              });
+}
+
+function update_ward(data) {
+    set_candidates("#candidate_1", data.candidates);
+    set_candidates("#candidate_2", data.candidates);
+    set_preferences("#preference_1", data.candidates.length);
+    set_preferences("#preference_2", data.candidates.length);
+    set_polling_stations(data.polling_stations);
+    change_candidates();
+}
+
+function set_candidates(options, candidates) {
+    $(options).empty();
+    $(options).append(new Option("Pick candidate"));
+    for (i in candidates) {
+        var candidate = candidates[i];
+        $(options).append(new Option(candidate.name, candidate.id));
+    }
+}
+
+function set_polling_stations(polling_stations) {
+    $('#stations').empty();
+    for (i in polling_stations) {
+        $('#stations').append("<div class='row'><div class='span4'>"+polling_stations[i].name+"</div><div class='span4' id='0"+polling_stations[i].id+"'></div><div class='span4' id='1"+polling_stations[i].id+"'></div></div>");
+    }
+}
+
+function set_preferences(name, size) {
+    $(name).empty();
+    for (i = 1; i <= size; i++) {
+        $(name).append(new Option(i, i - 1));
+    }
+}
+
+function change_candidates() {
     var type = $('#type').val();
     for (i in circles) {
         circles[i].setMap(null);
@@ -38,13 +80,13 @@ function change_details() {
 }
 
 function update_candidate(candidate, viewdata, results, type) {
-    map.setCenter(new google.maps.LatLng(viewdata.centre_lat, viewdata.centre_lon));
     for (i in results) {
         var station = results[i];
         add_heat(candidate, station, map, type);
         $("#"+candidate+station.id).text(station.votes["total"] + "  (" + station.votes["percentage"] + "%)");
         $("#"+candidate+station.id).css("background-color", colours[candidate]);
     }
+    map.setCenter(new google.maps.LatLng(viewdata.centre_lat, viewdata.centre_lon));
 }
 
 function add_heat(colour_index, result, ma, type) {

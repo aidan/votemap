@@ -4,16 +4,14 @@
 from flask import Blueprint, jsonify, render_template, request
 from shapely.geometry import MultiPoint
 
-from votemap.model import Candidate, PollingStation
+from votemap.model import Candidate, PollingStation, Ward
 
 controllers = Blueprint("controllers", __name__,
                         static_folder="static")
 
 @controllers.route("/", methods=["GET"])
 def index():
-    candidates = Candidate.objects.all()
-    polling_stations = PollingStation.objects.order_by("name").all()
-    return render_template("index.html", candidates=candidates, stations=polling_stations)
+    return render_template("index.html", wards=Ward.objects.all())
 
 @controllers.route("map", methods=["GET"])
 def map():
@@ -29,6 +27,8 @@ def get_candidate_data():
     geoms = []
     for ps in polling_stations:
         total = ps.get_total_for_candidate(candidate_id, preference)
+        if total == 0:
+            continue
         geoms.append(ps.coords)
         lat, lon = ps.coords
         data.append({"id": str(ps.id),
@@ -46,3 +46,19 @@ def get_candidate_data():
                 "centre_lon": area.centroid.y}
                   
     return jsonify(results=data, viewdata=viewdata)
+
+@controllers.route('get_ward_data')
+def get_ward_data():
+    ward_id = request.args["ward"]
+    ward = Ward.objects(id=ward_id).first()
+    candidate_data = []
+    for c in ward.get_candidates():
+        candidate_data.append({"id": str(c.id),
+                               "name": c.name
+                               })
+    polling_station_data = []
+    for p in ward.get_polling_stations():
+        polling_station_data.append({"id": str(p.id),
+                                     "name": p.name
+                                     })
+    return jsonify(candidates=candidate_data, polling_stations=polling_station_data)

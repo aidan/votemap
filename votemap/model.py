@@ -15,6 +15,12 @@ class Ward(db.Document):
     number = db.IntField(required=True, unique=True)
     name = db.StringField(required=True)
 
+    def get_polling_stations(self):
+        return PollingStation.objects(ward=self.id).all()
+
+    def get_candidates(self):
+        return Candidate.objects(ward=self.id).all()
+    
 class PollingStation(db.Document):
     name = db.StringField(required=True, unique=True)
     postcode = db.StringField(required=True, unique=True)
@@ -73,6 +79,7 @@ class Candidate(db.Document):
 
     name = db.StringField(required=True, unique=True)
     party = db.StringField()
+    ward = db.ReferenceField(Ward, required=True)
 
     @classmethod
     def get_by_name(cls, name):

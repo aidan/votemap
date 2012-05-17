@@ -91,7 +91,7 @@ def import_boxes(boxpath):
                 name = row[0]
                 candidate = Candidate.get_by_name(name)
                 if candidate is None:
-                    candidate = Candidate(name=name)
+                    candidate = Candidate(name=name, ward=box.polling_station.ward)
                     candidate.save()
                 tally = Tally(candidate=candidate)
                 try:
