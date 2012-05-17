@@ -30,6 +30,11 @@
           </option>
           {% endfor %}
         </select>
+        <select id="preference_1" name="preference_1">
+          {% for pref in candidates %}
+            <option value="{{ loop.index0 }}">Preference: {{ loop.index }}</option>
+          {% endfor %}
+        </select>
       </td>
       <td>
         <select id="candidate_2" name="candidate">
@@ -40,6 +45,11 @@
           <option value="{{ candidate.id }}">
             {{ candidate.name }}
           </option>
+          {% endfor %}
+        </select>
+        <select id="preference_2" name="preference_2">
+          {% for pref in candidates %}
+            <option value="{{ loop.index0 }}">Preference: {{ loop.index }}</option>
           {% endfor %}
         </select>
       </td>

@@ -23,11 +23,12 @@ def map():
 @controllers.route('get_candidate_data')
 def get_candidate_data():
     candidate_id = request.args["candidate_id"]
+    preference = int(request.args["preference"])
     data = []
     polling_stations = PollingStation.objects.all()
     geoms = []
     for ps in polling_stations:
-        total = ps.get_total_for_candidate(candidate_id)
+        total = ps.get_total_for_candidate(candidate_id, preference)
         geoms.append(ps.coords)
         lat, lon = ps.coords
         data.append({"id": str(ps.id),
@@ -36,7 +37,8 @@ def get_candidate_data():
                      "lon": lon,
                      "votes":
                          { "total": total,
-                           "percentage": int((float(total) / ps.get_total_votes()) * 100)
+                           "percentage": int((float(total) /
+                                              ps.get_total_votes(preference)) * 100)
                            }
                      })
     area = MultiPoint(geoms)

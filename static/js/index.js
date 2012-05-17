@@ -11,6 +11,8 @@ $(function() {
                                     myOptions);
       $('#candidate_1').bind('change', change_details);
       $('#candidate_2').bind('change', change_details);
+      $('#preference_1').bind('change', change_details);
+      $('#preference_2').bind('change', change_details);
       $('#type').bind('change', change_details);
 });
 
@@ -21,12 +23,14 @@ function change_details() {
     }
     circles = [];
     $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
-                  candidate_id:  $('#candidate_1').val()
+                  candidate_id:  $('#candidate_1').val(),
+                  preference: $('#preference_1').val()
               }, function(data) {
                   update_candidate(0, data.viewdata, data.results, type);
               });
     $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
-                  candidate_id:  $('#candidate_2').val()
+                  candidate_id:  $('#candidate_2').val(),
+                  preference: $('#preference_2').val()
               }, function(data) {
                   update_candidate(1, data.viewdata, data.results, type);
               });
