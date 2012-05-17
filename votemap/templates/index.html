@@ -3,28 +3,51 @@
 
 {% extends "base.html" %}
 
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  <style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0; padding: 0 }
+    #map_canvas { height: 100% }
+  </style>
+  <script type="text/javascript"
+          src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBtPenmfNLwDX1BOjuxnCD-eSsu4D5uXSk&sensor=false">
+  </script>      
+{% endblock %}
+  
+  
 {% block container %}
-
-  <table border="1">
-    {% for candidate in candidates %}
+  <table>
     <tr>
       <td>
-        {{ candidate.name }}
+        <select id="candidate" name="candidate">
+          <option selected="true">
+            --Pick a candidate---
+          </option>
+          {% for candidate in candidates %}
+          <option value="{{ candidate.id }}">
+            {{ candidate.name }}
+          </option>
+          {% endfor %}
+        </select>
+        <select id="type" name="type">
+          <option value="total">Total</option>
+          <option value="percentage">Percentage</option>
+        </select>
       </td>
+    <tr>
       <td>
         <table>
-          {% for station in stations[candidate.id].keys() %}
+          {% for station in stations %}
           <tr>
-            <td>{{ station }}: {{ stations[candidate.id][station] }}</td>
+            <td> {{ station.name }} : </td>
+            <td><span id="{{ station.id }}">Unknown for {{ station.name }}</span></td>
           </tr>
           {% endfor %}
         </table>
       </td>
-      <td>
-        <iframe id="map" height="660" width="880" src="{{ url_for('controllers.map', candidate_id=candidate.id) }} "></iframe>
-      </td>
     </tr>
-    {% endfor %}
   </table>
+  <div id="map_canvas"></div>
 {% endblock container %}
 

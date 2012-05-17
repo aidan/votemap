@@ -5,27 +5,13 @@
   <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1"> 
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+    <script type="text/javascript">
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    {%- block scripts %}{% endblock scripts %}
   </head>
-
   <body>
-    <div data-role="page">
-      <div data-role="header">
-        {%- block navigation %}{%- endblock navigation %}
-      </div><!-- /header -->
-      
-      <div data-role="content">	
-        {%- block container %}{% endblock container %}
-      </div><!-- /content -->
-      
-      <footer>
-        <p>&copy; Aidan Skinner 2012</p>
-      </footer>
-    </div><!-- /page -->
+    {%- block container %}{% endblock container %}
   </body>
 </html>
