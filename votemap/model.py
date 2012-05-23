@@ -16,6 +16,16 @@ class Ward(db.Document):
     number = db.IntField(required=True, unique=True)
     name = db.StringField(required=True)
 
+    @classmethod
+    def ensure_ward(cls, name, number):
+        ward = cls.objects(number=number).first()
+        if ward is None:
+            ward = Ward()
+            ward.number = number
+            ward.name = name
+            ward.save()
+        return ward
+    
     def get_polling_stations(self):
         return PollingStation.objects(ward=self.id).all()
 
@@ -82,6 +92,14 @@ class Candidate(db.Document):
     party = db.StringField()
     ward = db.ReferenceField(Ward, required=True)
 
+    @classmethod
+    def ensure_candidate(cls, name, ward, party=None):
+        candidate = cls.get_by_name(name)
+        if candidate is None:
+            candidate = Candidate(name=name, ward=ward, party=party)
+            candidate.save()
+        return candidate
+    
     @classmethod
     def get_by_name(cls, name):
         return cls.objects(name=name).first()
