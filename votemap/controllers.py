@@ -23,13 +23,21 @@ def get_candidate_data():
     try:
         candidate_id = request.args["candidate_id"]
         preference = int(request.args["preference"])
+        ward = request.args["ward"]
         current_app.logger.error("get_candidate_data %s %s" % (candidate_id, preference))
         geoms = []
         ps = {}
-        candidate = Candidate.objects(id=candidate_id).first()
-        if candidate is None:
-            return
-        tallies = Tally.objects(candidate=candidate).all()
+        try:
+            candidate = Candidate.objects(id=candidate_id).first()
+            tallies = Tally.objects(candidate=candidate).all()
+        except:
+            party_name = candidate_id
+            candidates = Candidate.get_by_party(party_name, ward)
+            tallies = set()
+            for c in candidates:
+                tallies = tallies | set(Tally.objects(candidate=c).all())
+            tallies = list(tallies)
+            
         for tally in tallies:
             p = tally.polling_station.id
             if p not in ps:
@@ -66,13 +74,19 @@ def get_ward_data():
     ward_id = request.args["ward"]
     ward = Ward.objects(id=ward_id).first()
     candidate_data = []
+    parties = []
     for c in ward.get_candidates():
+        if c.party not in parties:
+            parties.append(c.party)
         candidate_data.append({"id": str(c.id),
-                               "name": c.name
+                               "name": c.name,
+                               "party": c.party
                                })
     polling_station_data = []
     for p in ward.get_polling_stations():
         polling_station_data.append({"id": str(p.id),
                                      "name": p.name
                                      })
-    return jsonify(candidates=candidate_data, polling_stations=polling_station_data)
+    return jsonify(candidates=candidate_data,
+                   parties=sorted(parties),
+                   polling_stations=polling_station_data)

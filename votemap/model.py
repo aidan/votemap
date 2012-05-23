@@ -104,6 +104,10 @@ class Candidate(db.Document):
     def get_by_name(cls, name):
         return cls.objects(name=name).first()
 
+    @classmethod
+    def get_by_party(cls, party, ward):
+        return cls.objects(party=party, ward=ward).all()
+
 class Tally(db.Document):
     candidate = db.ReferenceField(Candidate, required=True)
     preferences = db.ListField()

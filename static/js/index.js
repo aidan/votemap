@@ -12,6 +12,8 @@ $(function() {
       $('#ward').bind('change', change_ward);
       $('#candidate_1').bind('change', change_candidates);
       $('#candidate_2').bind('change', change_candidates);
+      $('#party_1').bind('change', change_candidates);
+      $('#party_2').bind('change', change_candidates);
       $('#preference_1').bind('change', change_candidates);
       $('#preference_2').bind('change', change_candidates);
       $('#type').bind('change', change_candidates);
@@ -27,20 +29,31 @@ function change_ward() {
 }
 
 function update_ward(data) {
-    set_candidates("#candidate_1", data.candidates);
-    set_candidates("#candidate_2", data.candidates);
+    set_candidates("#candidate_1", data.candidates, data.parties);
+    set_candidates("#candidate_2", data.candidates, data.parties);
     set_preferences("#preference_1", data.candidates.length);
     set_preferences("#preference_2", data.candidates.length);
     set_polling_stations(data.polling_stations);
     change_candidates();
 }
 
-function set_candidates(options, candidates) {
+function set_parties(options, parties) {
     $(options).empty();
-    $(options).append(new Option("Pick candidate"));
+    $(options).append(new Option("Pick party"));
+    for (i in parties) {
+        $(options).append(new Option(parties[i]));
+    }
+}
+
+function set_candidates(options, candidates, parties) {
+    $(options).empty();
+    $(options).append(new Option("Pick party or candidate"));
+    for (i in parties) {
+         $(options).append(new Option(parties[i]));
+    }
     for (i in candidates) {
         var candidate = candidates[i];
-        $(options).append(new Option(candidate.name, candidate.id));
+        $(options).append(new Option(candidate.name + " ("+candidate.party+")", candidate.id));
     }
 }
 
@@ -66,13 +79,15 @@ function change_candidates() {
     circles = [];
     $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
                   candidate_id:  $('#candidate_1').val(),
-                  preference: $('#preference_1').val()
+                  preference: $('#preference_1').val(),
+                  ward: $('#ward').val()
               }, function(data) {
                   update_candidate(0, data.viewdata, data.results, type);
               });
     $.getJSON($SCRIPT_ROOT + '/get_candidate_data', {
                   candidate_id:  $('#candidate_2').val(),
-                  preference: $('#preference_2').val()
+                  preference: $('#preference_2').val(),
+                  ward: $('#ward').val()
               }, function(data) {
                   update_candidate(1, data.viewdata, data.results, type);
               });
