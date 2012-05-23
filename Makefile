@@ -59,4 +59,4 @@ check: pep8 pyflakes test
 	{ echo 'Unit tests coverage is incomplete.'; exit 1; }
 
 import-data:
-	@python import_data.py -b data/glasgow/2012/boxes -p data/glasgow/2012/polling_stations.csv
+	@python import_data.py -n data/glasgow/2012/NoticeofPoll.txt -b data/glasgow/2012/boxes -p data/glasgow/2012/polling_stations.csv

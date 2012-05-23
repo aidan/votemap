@@ -21,12 +21,11 @@ def import_polling_stations(pspath):
     for row in ps_reader:
         m = re.match("^WARD ([0-9]+) [^A-Za-z]* (.*)", row[0])
         if m:
-            ward = Ward()
-            ward.number = m.group(1)
-            ward.name = m.group(2)
-            ward.save()
+            number = m.group(1)
+            name = m.group(2)
+            ward = Ward.ensure_ward(name, number)
+            print ("Processing ward %s - %s" % (ward.number, ward.name))
             ward_count = ward_count + 1
-            print ("Adding ward %s - %s" % (ward.number, ward.name))
         elif re.match("^Polling Place and Address", row[0]) or \
                 re.match("^TOTAL", row[0]) or len(row[0]) == 0:
             continue
@@ -106,7 +105,46 @@ def import_boxes(boxpath):
 
     print ("Added %d boxes to finish with %d" %
            (count, Box.objects.count()))
-            
-            
-            
-            
+
+def import_candidates(notice_file):
+    f = open(notice_file, 'rb')
+    print ("Started with %d Candidates" % (Candidate.objects.count()))
+    print ("Started with %d Wards" % (Ward.objects.count()))
+    try:
+        in_candidates = False
+        for line in f:
+            m = re.match("^WARD ([0-9]+) [^A-Za-z]* (.*)", line)
+            if m:
+                number = m.group(1)
+                name = m.group(2)
+                ward = Ward.ensure_ward(name, number)
+            elif not in_candidates:
+                if re.match("^Description", line):
+                    in_candidates = True
+                    surname = None
+                    forename = None
+                    party = None
+            elif re.match("^Address", line):
+                in_candidates = False
+            else:
+                if re.match("^[0-9]", line):
+                    pass
+                elif re.match("^[A-Z]['A-Z]+", line):
+                    surname = line[:-1]
+                elif re.match("^[A-Z][a-z]*", line):
+                    if not forename:
+                        forename = line[:-1]
+                    else:
+                        party = line[:-1]
+                        name = ("%s %s" % (forename, surname))
+                        Candidate.ensure_candidate(name, ward, party)
+                        surname = None
+                        forename = None
+                        party = None
+
+            pass
+    finally:
+        print ("Finished with %d Candidates" % (Candidate.objects.count()))
+        print ("Finished with %d Wards" % (Ward.objects.count()))
+        f.close()
+        
