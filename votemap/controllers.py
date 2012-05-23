@@ -1,7 +1,7 @@
 # Copyright 2012 Aidan Skinner <aidan@skinner.me.uk>, all rights
 # reserved
 
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, current_app, jsonify, render_template, request
 from shapely.geometry import MultiPoint
 
 from votemap.model import Candidate, PollingStation, Tally, Ward
@@ -20,41 +20,46 @@ def map():
 
 @controllers.route('get_candidate_data')
 def get_candidate_data():
-    candidate_id = request.args["candidate_id"]
-    preference = int(request.args["preference"])
-    geoms = []
-    ps = {}
-    candidate = Candidate.objects(id=candidate_id).first()
-    if candidate is None:
-        return
-    tallies = Tally.objects(candidate=candidate).all()
-    for tally in tallies:
-        p = tally.polling_station.id
-        if p not in ps:
-            ps[p] = tally.preferences[preference]
-        else:
-            ps[p] += tally.preferences[preference]
+    try:
+        candidate_id = request.args["candidate_id"]
+        preference = int(request.args["preference"])
+        current_app.logger.error("get_candidate_data %s %s" % (candidate_id, preference))
+        geoms = []
+        ps = {}
+        candidate = Candidate.objects(id=candidate_id).first()
+        if candidate is None:
+            return
+        tallies = Tally.objects(candidate=candidate).all()
+        for tally in tallies:
+            p = tally.polling_station.id
+            if p not in ps:
+                ps[p] = tally.preferences[preference]
+            else:
+                ps[p] += tally.preferences[preference]
         
-    data = []
-    for p_id, total in ps.items():
-        p = PollingStation.objects(id=p_id).first()
-        geoms.append(p.coords)
-        lat, lon = p.coords
-        data.append({"id": str(p.id),
-                     "name": p.name,
-                     "lat": lat,
-                     "lon": lon,
-                     "votes":
-                         { "total": total,
-                           "percentage": int((float(total) /
-                                              p.get_total_votes(preference)) * 100)
-                           }
-                     })
-    area = MultiPoint(geoms)
-    viewdata = {"centre_lat": area.centroid.x,
-                "centre_lon": area.centroid.y}
+        data = []
+        for p_id, total in ps.items():
+            p = PollingStation.objects(id=p_id).first()
+            geoms.append(p.coords)
+            lat, lon = p.coords
+            data.append({"id": str(p.id),
+                         "name": p.name,
+                         "lat": lat,
+                         "lon": lon,
+                         "votes":
+                             { "total": total,
+                               "percentage": int((float(total) /
+                                                  p.get_total_votes(preference)) * 100)
+                               }
+                         })
+            area = MultiPoint(geoms)
+            viewdata = {"centre_lat": area.centroid.x,
+                        "centre_lon": area.centroid.y}
                   
-    return jsonify(results=data, viewdata=viewdata)
+        return jsonify(results=data, viewdata=viewdata)
+    except:
+        current_app.logger.exception("get_candidate_data failed!")
+        return jsonify({})
 
 @controllers.route('get_ward_data')
 def get_ward_data():

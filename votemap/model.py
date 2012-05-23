@@ -5,6 +5,7 @@ import json
 import time
 import urllib
 
+from flask import current_app
 from flaskext.mongoengine import MongoEngine
 
 from mongoengine.queryset import QuerySet
@@ -48,7 +49,7 @@ class PollingStation(db.Document):
                 try:
                     total = total + tally.preferences[preference]
                 except:
-                    print ("Box %s tally for %s failed " % (box.number, tally.candidate.name))
+                    current_app.logger.error ("Box %s tally for %s failed " % (box.number, tally.candidate.name))
         return total
     
     def update_coords(self):
